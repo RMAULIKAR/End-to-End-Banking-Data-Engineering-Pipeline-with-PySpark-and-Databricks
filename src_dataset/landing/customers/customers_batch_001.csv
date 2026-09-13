@@ -1,0 +1,14 @@
+customer_id,name,dob,kyc_status,address,updated_at
+1,James Wilson,01-02-1985,VERIFIED,Pune,01-01-2024
+1,James Wilson,01-02-1985,VERIFIED,Mumbai,01-06-2024
+1,James Wilson,01-02-1985,EXPIRED,Mumbai,10-01-2025
+1,James Wilson,01-02-1985,VERIFIED,Mumbai,15-02-2025
+2,Emily Carter,11-07-1990,PENDING,Delhi,10-02-2024
+2,Emily Carter,11-07-1990,VERIFIED,Delhi,20-02-2024
+2,Emily Carter,11-07-1990,VERIFIED,Bangalore,05-01-2025
+3,Michael Brown,23-11-1988,VERIFIED,Chennai,15-03-2024
+3,Michael Brown,23-11-1988,EXPIRED,Chennai,15-03-2025
+4,Sophia Miller,17-05-1992,PENDING,Hyderabad,05-04-2024
+4,Sophia Miller,17-05-1992,VERIFIED,Hyderabad,20-04-2024
+5,Daniel Anderson,30-09-1987,VERIFIED,Kolkata,12-05-2024
+5,Daniel Anderson,30-09-1987,VERIFIED,Pune,01-02-2025

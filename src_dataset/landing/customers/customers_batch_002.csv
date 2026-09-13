@@ -1,0 +1,8 @@
+customer_id,name,dob,kyc_status,address,updated_at
+1,James Wilson,01-02-1985,VERIFIED,Pune,10-03-2025
+2,Emily Carter,11-07-1990,VERIFIED,Mumbai,15-03-2025
+3,Michael Brown,23-11-1988,VERIFIED,Chennai,20-03-2025
+4,Sophia Miller,17-05-1992,VERIFIED,Hyderabad,25-03-2025
+5,Daniel Anderson,30-09-1987,VERIFIED,Pune,01-04-2025
+6,Olivia Taylor,14-08-1991,PENDING,Delhi,05-04-2025
+7,William Thomas,22-12-1986,VERIFIED,Mumbai,10-04-2025
