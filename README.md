@@ -4,7 +4,7 @@ An end-to-end banking data engineering project that processes customer, account,
 
 ---
 
-##  Project Overview
+## Project Overview
 
 This project implements a scalable banking data pipeline that processes customer, account, and transaction data through multiple layers.
 
@@ -32,7 +32,7 @@ The pipeline is orchestrated using **Databricks Workflows**, with individual tas
 
 ---
 
-##  Objectives
+## Objectives
 
 - Implement incremental file ingestion using Databricks Auto Loader
 - Process banking customer, account, and transaction data
@@ -46,7 +46,7 @@ The pipeline is orchestrated using **Databricks Workflows**, with individual tas
 
 ---
 
-##  Architecture
+## Architecture
 
 ```text
                          ┌─────────────────────┐
@@ -59,14 +59,14 @@ The pipeline is orchestrated using **Databricks Workflows**, with individual tas
                                     │
                                     ▼
                          ┌─────────────────────┐
-                         │    Auto Loader      │
-                         │ Incremental Ingest  │
+                         │     Auto Loader     │
+                         │   Incremental Ingest│
                          └──────────┬──────────┘
                                     │
                                     ▼
                          ┌─────────────────────┐
                          │    Bronze Layer     │
-                         │       Delta         │
+                         │        Delta        │
                          └──────────┬──────────┘
                                     │
                                     ▼
@@ -74,7 +74,7 @@ The pipeline is orchestrated using **Databricks Workflows**, with individual tas
                          │    Silver Layer     │
                          │                     │
                          │ Cleaning            │
-                         │ Transformation     │
+                         │ Transformation      │
                          │ SCD Type 2          │
                          └──────────┬──────────┘
                                     │
@@ -93,12 +93,12 @@ The pipeline is orchestrated using **Databricks Workflows**, with individual tas
                          └──────────┬──────────┘
                                     │
                                     ▼
-                              BI / Analytics
+                               BI / Analytics
 ```
 
 ---
 
-##  Data Sources
+## Data Sources
 
 The project uses three primary datasets.
 
@@ -140,7 +140,7 @@ Contains banking transaction records.
 
 ---
 
-#  Incremental Ingestion
+# Incremental Ingestion
 
 Databricks **Auto Loader** is used to incrementally ingest new CSV files from the landing layer.
 
@@ -181,7 +181,7 @@ This allows the pipeline to process new data without reprocessing previously ing
 
 ---
 
-#  Bronze Layer
+# Bronze Layer
 
 The Bronze layer stores the incrementally ingested data as **Delta tables**.
 
@@ -205,7 +205,7 @@ Explicit schemas are used during ingestion to avoid unreliable automatic type in
 
 ---
 
-#  Silver Layer
+# Silver Layer
 
 The Silver layer performs data cleaning and transformation.
 
@@ -237,7 +237,7 @@ The SCD Type 2 process maintains historical versions while identifying the curre
 
 ---
 
-#  Gold Layer
+# Gold Layer
 
 The Gold layer contains business-level KPI datasets used for analytics.
 
@@ -268,7 +268,7 @@ Examples include:
 
 ---
 
-#  Business Views
+# Business Views
 
 SQL views are created on top of the Gold datasets for downstream consumption.
 
@@ -276,6 +276,7 @@ Example:
 
 ```sql
 CREATE OR REPLACE VIEW bankingprojectpyspark_cata.man_schema.vw_customer_kpis AS
+
 SELECT *
 FROM bankingprojectpyspark_cata.man_schema.customer_kpis;
 ```
@@ -294,38 +295,45 @@ Analytics / BI
 
 ---
 
-#  Workflow Orchestration
+# Workflow Orchestration
 
 The complete pipeline is orchestrated using a **Databricks Workflow** named:
 
 **Banking Data Engineering Workflow**
 
-The workflow manages dependencies between ingestion, transformation, KPI, and view tasks.
+The workflow manages dependencies between provisioning, KPI generation, SCD Type 2 validation, and the final result task.
 
-Example workflow:
+### Workflow
 
-                            Bronze Layer
-                                ↓
-                            Silver Layer
-                                ↓
-                            Business Views  
-                                ↓  
- ┌──────────────┬───────────────┬────────────────────┬─────────────────────────┐
- ↓              ↓               ↓                    ↓
-Account KPIs   Customer KPIs   SCD2 Validation     Monthly Transaction KPIs
- └──────────────┴───────────────┴────────────────────┴─────────────────────────┘
-                                ↓
-                            Views_db/views.sql
+```text
+bronze_provision
+       ↓
+silver_provision
+       ↓
+ ┌──────────────┬────────────────┬───────────────────┬──────────────────────────┐
+ ↓              ↓                ↓                   ↓
+account_kpis   customer_kpis   err_scd2_customer   monthly_transaction_kpis
+ └──────────────┴────────────────┴───────────────────┴──────────────────────────┘
+                              ↓
+                           result_db
 ```
-- **bronze_provision runs first.**
-- **silver_provision runs after the Bronze layer is provisioned.**
-- **After silver_provision completes, the four downstream tasks run independently/in parallel:**
-account_kpis
-customer_kpis
-err_scd2_customer
-monthly_transaction_kpis
-**result_db runs after the downstream KPI and validation tasks complete.**
-#  Technologies Used
+
+### Task Dependencies
+
+- **`bronze_provision`** runs first.
+- **`silver_provision`** runs after `bronze_provision` completes.
+- After `silver_provision` completes, the following four tasks run independently/in parallel:
+  - `account_kpis`
+  - `customer_kpis`
+  - `err_scd2_customer`
+  - `monthly_transaction_kpis`
+- **`result_db`** runs after the downstream KPI and validation tasks complete.
+
+The KPI tasks represent the **Gold/business-level processing layer**, while `result_db` provides the final consolidated output for downstream business views.
+
+---
+
+# Technologies Used
 
 - **Python**
 - **PySpark**
@@ -338,7 +346,7 @@ monthly_transaction_kpis
 
 ---
 
-#  Project Structure
+# Project Structure
 
 ```text
 banking-data-engineering/
@@ -355,11 +363,11 @@ banking-data-engineering/
 │   │   ├── enr_accounts.py
 │   │   └── enr_transactions.py
 │   │
-│   └── gold/     
-|       └── scd2_customers.py
+│   └── gold/
+│       ├── scd2_customers.py
 │       ├── customer_kpis.py
 │       ├── account_kpis.py
-│       └── monthly_transaction_kpis.py              
+│       └── monthly_transaction_kpis.py
 │
 ├── sql/
 │   └── views.sql
@@ -369,7 +377,7 @@ banking-data-engineering/
 
 ---
 
-#  Key Features
+# Key Features
 
 ### Incremental Processing
 
@@ -397,7 +405,7 @@ Gold datasets are exposed through SQL views for analytics and BI consumption.
 
 ---
 
-#  Pipeline Flow
+# Pipeline Flow
 
 The complete pipeline can be summarized as:
 
@@ -425,6 +433,6 @@ Analytics
 
 ---
 
-#  Project Outcome
+# Project Outcome
 
 This project demonstrates an end-to-end data engineering workflow for banking data, covering **incremental ingestion, distributed data processing, data transformation, historical data management, business aggregation, and workflow orchestration** using PySpark and Databricks.
