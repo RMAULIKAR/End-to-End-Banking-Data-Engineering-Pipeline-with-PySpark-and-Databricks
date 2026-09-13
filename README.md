@@ -406,11 +406,15 @@ New CSV File
      ↓
 Auto Loader
      ↓
-Bronze Delta
+Bronze Layer
      ↓
 Silver Transformation
      ↓
-SCD Type 2 / Data Cleaning
+Silver Layer
+     ↓
+Gold Transformation
+     ↓
+Gold Layer
      ↓
 Gold KPI Tables
      ↓
