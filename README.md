@@ -304,32 +304,27 @@ The workflow manages dependencies between ingestion, transformation, KPI, and vi
 
 Example workflow:
 
-```text
-Customer Ingestion
-       ↓
-Customer Enrichment
-       ↓
-SCD Type 2
-
-Account Ingestion
-       ↓
-Account Enrichment
-
-Transaction Ingestion
-       ↓
-Transaction Enrichment
-       ↓
- ┌─────┼──────────────┐
- ↓     ↓              ↓
-Account  Customer   Monthly
-KPIs     KPIs       Transaction KPIs
- └─────┬──────────────┘
-       ↓
-   Business Views
+                            Bronze Layer
+                                ↓
+                            Silver Layer
+                                ↓
+                            Business Views  
+                                ↓  
+ ┌──────────────┬───────────────┬────────────────────┬─────────────────────────┐
+ ↓              ↓               ↓                    ↓
+Account KPIs   Customer KPIs   SCD2 Validation     Monthly Transaction KPIs
+ └──────────────┴───────────────┴────────────────────┴─────────────────────────┘
+                                ↓
+                            Views_db/views.sql
 ```
-
----
-
+- **bronze_provision runs first.**
+- **silver_provision runs after the Bronze layer is provisioned.**
+- **After silver_provision completes, the four downstream tasks run independently/in parallel:**
+account_kpis
+customer_kpis
+err_scd2_customer
+monthly_transaction_kpis
+**result_db runs after the downstream KPI and validation tasks complete.**
 #  Technologies Used
 
 - **Python**
@@ -350,21 +345,21 @@ banking-data-engineering/
 │
 ├── src/
 │   │
-│   ├── bronze/
+│   ├── bronze/ingest_bronze
 │   │   ├── ingest_customers.py
 │   │   ├── ingest_accounts.py
 │   │   └── ingest_transactions.py
 │   │
-│   ├── silver/
+│   ├── silver/ingest_silver
 │   │   ├── enr_customers.py
 │   │   ├── enr_accounts.py
-│   │   ├── enr_transactions.py
-│   │   └── scd2_customers.py
+│   │   └── enr_transactions.py
 │   │
-│   └── gold/
+│   └── gold/     
+|       └── scd2_customers.py
 │       ├── customer_kpis.py
 │       ├── account_kpis.py
-│       └── monthly_transaction_kpis.py
+│       └── monthly_transaction_kpis.py              
 │
 ├── sql/
 │   └── views.sql
